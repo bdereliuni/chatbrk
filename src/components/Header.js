@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../utils/supabase';
 import '../styles.css'; // Stil dosyasını dahil ediyoruz
 
-const Header = ({ isLoggedIn, toggleSidebar }) => {
+const Header = ({ isLoggedIn, toggleSidebar, selectedModel, onModelSelect }) => {
   const navigate = useNavigate();
 
   const handleLogout = async () => {

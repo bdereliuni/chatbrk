@@ -597,32 +597,23 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-muted);
+  color: var(--text-color);
   text-align: center;
   font-size: 1.1rem;
-  background-color: var(--bg-card);
+  background-color: var(--bg-main);
   border-radius: var(--radius);
-  padding: 2rem;
-  box-shadow: var(--shadow);
-  max-width: 400px;
+  padding: 3rem;
+  box-shadow: none;
+  width: 100%;
+  max-width: 700px;
   margin: 2rem auto;
+  position: relative;
+  overflow: hidden;
 }
 
 .no-chat-selected::before {
+  display: none; /* Pseudo-elementi gizle */
   content: '';
-  display: block;
-  width: 60px;
-  height: 60px;
-  background-color: rgba(74, 108, 255, 0.1);
-  border-radius: 50%;
-  margin-bottom: 1rem;
-  position: absolute;
-  top: -2rem;
-  left: 50%;
-  transform: translateX(-50%);
-  background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z' stroke='%234A6CFF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: center;
 }
 
 /* Sidebar iyileştirmeleri */
@@ -1209,7 +1200,7 @@ body {
 .message-input:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(83, 109, 254, 0.2);
+  box-shadow: 0 0 0 2px rgba(83, 109, 254, 0.2);
 }
 
 .send-button {
@@ -1341,13 +1332,16 @@ body {
   box-shadow: 0 4px 8px rgba(83, 109, 254, 0.2);
 }
 
-/* Enhanced Markdown styling for chat messages */
+/* Markdown içeriği için geliştirilmiş stiller */
 .markdown-content {
-  line-height: 1.6;
+  line-height: 1.5;
   white-space: pre-wrap;
   word-break: break-word;
+  font-size: 1rem;
+  color: var(--text-primary);
 }
 
+/* Başlıklar için geliştirilmiş stiller - boşluklar minimum */
 .markdown-content h1,
 .markdown-content h2,
 .markdown-content h3,
@@ -1355,66 +1349,178 @@ body {
 .markdown-content h5,
 .markdown-content h6,
 .markdown-heading {
-  margin-top: 1.5rem !important;
-  margin-bottom: 1rem !important;
+  margin-top: 0.3rem !important;
+  margin-bottom: 0.1rem !important;
   font-weight: 600 !important;
-  line-height: 1.25 !important;
+  line-height: 1.2 !important;
   display: block !important;
   color: var(--text-primary) !important;
 }
 
 .markdown-content h1,
 .markdown-heading.h1 {
-  font-size: 1.75rem !important;
+  font-size: 1.3rem !important;
   border-bottom: 1px solid var(--border-color);
-  padding-bottom: 0.5rem;
+  padding-bottom: 0.1rem;
+  color: var(--primary-color) !important;
 }
 
 .markdown-content h2,
 .markdown-heading.h2 {
-  font-size: 1.5rem !important;
+  font-size: 1.2rem !important;
   border-bottom: 1px solid var(--border-color);
-  padding-bottom: 0.3rem;
+  padding-bottom: 0.1rem;
+  color: var(--secondary-color) !important;
 }
 
 .markdown-content h3,
 .markdown-heading.h3 {
-  font-size: 1.25rem !important;
+  font-size: 1.1rem !important;
 }
 
-.markdown-content p,
-.markdown-paragraph {
-  margin-bottom: 1rem !important;
-  display: block !important;
-}
-
-.markdown-content br {
-  display: block !important;
-  content: "" !important;
-  margin-top: 0.5rem !important; 
-}
-
+/* Liste öğelerinin doğru görüntülenmesi için özel stiller */
 .markdown-content ul,
 .markdown-content ol {
-  margin-bottom: 1rem !important;
-  margin-left: 1.5rem !important;
+  margin: 0.3rem 0 !important;
+  padding-left: 1.5rem !important;
+  list-style-position: outside !important;
+}
+
+.markdown-content li,
+.markdown-list-item {
+  display: list-item !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  line-height: 1.4 !important;
+}
+
+/* Liste içindeki diğer öğelerin doğru görüntülenmesi */
+.markdown-content li p {
+  margin: 0 !important;
+  line-height: 1.4 !important;
+}
+
+/* Satır aralıklarını düzenle - minimum boşluk */
+.markdown-content p {
+  margin: 0.2rem 0 !important;
+  line-height: 1.4 !important;
+}
+
+/* Paragraf ile liste arası boşlukları düzenle - minimum boşluk */
+.markdown-content p + ul,
+.markdown-content p + ol {
+  margin-top: 0.1rem !important;
+}
+
+/* Liste sonrası gelen paragraf için boşluk ekle - minimum boşluk */
+.markdown-content ul + p,
+.markdown-content ol + p {
+  margin-top: 0.2rem !important;
+}
+
+/* Liste içindeki paragraflar için özel stil */
+.markdown-content li p,
+.markdown-list-item p {
+  margin: 0 !important;
+}
+
+/* Mesaj içeriği için özel stiller - sıkıştırılmış */
+.message-text {
+  padding: 6px 10px;
+  border-radius: var(--radius);
+  line-height: 1.4 !important;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+/* Markdown içeriği için geliştirilmiş stiller - sıkıştırılmış */
+.markdown-content {
+  line-height: 1.4 !important;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+/* Mesaj içindeki boşlukları düzenle - minimum */
+.message-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+/* Boş satırlar için daha az boşluk */
+.markdown-content br + br {
+  margin-top: 0.1rem !important;
+  line-height: 0.8 !important;
+}
+
+/* Markdown listelerinde son elemanın altındaki boşluğu azalt */
+.markdown-list:last-child {
+  margin-bottom: 0.3rem !important;
+}
+
+/* Referans etiketleri için özel stil */
+.reference-tag {
+  font-size: 0.75rem;
+  color: var(--primary-color);
+  vertical-align: super;
+  margin-left: 2px;
+  margin-right: 2px;
+  font-weight: 500;
+  background-color: rgba(83, 109, 254, 0.1);
+  padding: 1px 4px;
+  border-radius: 4px;
+  text-decoration: none;
+  display: inline-block;
+}
+
+/* Tablo için geliştirilmiş stiller */
+.table-container {
+  overflow-x: auto !important;
+  margin-bottom: 1.5rem !important;
+  border-radius: var(--radius) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+.markdown-table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  margin-bottom: 0 !important;
+  display: table !important;
+}
+
+.markdown-table th,
+.markdown-table td {
+  border: 1px solid var(--border-color) !important;
+  padding: 0.75rem !important;
+  text-align: left !important;
+}
+
+.markdown-table th {
+  background-color: rgba(0, 0, 0, 0.2) !important;
+  font-weight: 600 !important;
+}
+
+.markdown-table tr:nth-child(even) {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Alıntı blokları için geliştirilmiş stiller */
+.markdown-blockquote {
+  border-left: 4px solid var(--primary-color) !important;
+  padding: 0.5rem 0 0.5rem 1rem !important;
+  margin: 1.5rem 0 !important;
+  background-color: rgba(83, 109, 254, 0.05) !important;
+  border-radius: 0 var(--radius) var(--radius) 0 !important;
+  color: var(--text-secondary) !important;
   display: block !important;
 }
 
-.markdown-content li {
-  margin-bottom: 0.5rem !important;
-  display: list-item !important;
-}
-
-.markdown-content a {
-  color: var(--primary-color) !important;
-  text-decoration: none !important;
-}
-
-.markdown-content a:hover {
-  text-decoration: underline !important;
-}
-
+/* Kod blokları için geliştirilmiş stiller */
 .markdown-content code {
   background-color: rgba(0, 0, 0, 0.2) !important;
   padding: 0.2rem 0.4rem !important;
@@ -1430,12 +1536,14 @@ body {
   overflow-x: auto !important;
   margin-bottom: 1rem !important;
   display: block !important;
+  border: 1px solid var(--border-color) !important;
 }
 
 .codeblock {
   border-radius: var(--radius) !important;
   margin: 1rem 0 !important;
   overflow-x: auto !important;
+  border: 1px solid var(--border-color) !important;
 }
 
 .codeblock-inline {
@@ -1449,35 +1557,10 @@ body {
 .markdown-content pre code {
   background-color: transparent !important;
   padding: 0 !important;
+  border: none !important;
 }
 
-.markdown-content blockquote {
-  border-left: 4px solid var(--primary-color) !important;
-  padding-left: 1rem !important;
-  margin-left: 0 !important;
-  margin-bottom: 1rem !important;
-  color: var(--text-secondary) !important;
-  display: block !important;
-}
-
-.markdown-content table {
-  width: 100% !important;
-  border-collapse: collapse !important;
-  margin-bottom: 1rem !important;
-  display: table !important;
-}
-
-.markdown-content table th,
-.markdown-content table td {
-  border: 1px solid var(--border-color) !important;
-  padding: 0.5rem !important;
-  text-align: left !important;
-}
-
-.markdown-content table th {
-  background-color: rgba(0, 0, 0, 0.2) !important;
-}
-
+/* Yatay çizgi için geliştirilmiş stiller */
 .markdown-content hr {
   border: none !important;
   height: 1px !important;
@@ -1486,20 +1569,39 @@ body {
   display: block !important;
 }
 
-.markdown-content img {
-  max-width: 100% !important;
-  height: auto !important;
-  border-radius: var(--radius) !important;
-  margin: 1rem 0 !important;
-}
-
-/* Strong and emphasis */
+/* Kalın ve italik metin için geliştirilmiş stiller */
 .markdown-content strong {
   font-weight: 600 !important;
+  color: var(--text-primary) !important;
 }
 
 .markdown-content em {
   font-style: italic !important;
+  color: var(--text-secondary) !important;
+}
+
+/* Resimler için geliştirilmiş stiller */
+.markdown-image {
+  max-width: 100% !important;
+  height: auto !important;
+  border-radius: var(--radius) !important;
+  margin: 1rem 0 !important;
+  border: 1px solid var(--border-color) !important;
+  display: block !important;
+}
+
+/* Bağlantılar için geliştirilmiş stiller */
+.markdown-link {
+  color: var(--primary-color) !important;
+  text-decoration: none !important;
+  border-bottom: 1px dashed var(--primary-color) !important;
+  transition: all 0.2s ease !important;
+}
+
+.markdown-link:hover {
+  text-decoration: none !important;
+  border-bottom: 1px solid var(--primary-color) !important;
+  background-color: rgba(83, 109, 254, 0.1) !important;
 }
 
 /* Responsive tasarım güncelleme */
@@ -1663,50 +1765,76 @@ body {
   }
   
   .input-container {
-    padding: 0.8rem;
+    padding: 8px;
   }
   
-  .message-input {
-    font-size: 0.9rem;
-    padding: 8px 10px;
-    padding-right: 40px;
+  .input-row {
+    flex-direction: row;
+    gap: 6px;
+    align-items: center;
+    width: 100%;
   }
   
-  .send-button {
-    right: 1.2rem;
-    bottom: 1.3rem;
-    width: 32px;
-    height: 32px;
+  .input-message-wrapper {
+    flex: 1;
+    position: relative;
+    width: 100%;
   }
   
-  .chat-title {
-    font-size: 0.9rem;
-  }
-  
-  .model-option-name {
-    font-size: 0.9rem;
-  }
-  
-  .model-option-description {
-    font-size: 0.7rem;
-  }
-  
-  .welcome-title {
-    font-size: 1.4rem;
-  }
-  
-  .welcome-subtitle {
-    font-size: 0.9rem;
-  }
-  
-  .suggestion-chip {
-    font-size: 0.8rem;
-    padding: 0.5rem 0.8rem;
+  .model-selector-inline {
+    margin-right: 4px;
   }
   
   .model-selector-inline-button {
-    padding: 0.3rem 0.5rem;
-    font-size: 0.7rem;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+  }
+  
+  .model-icon svg {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .message-input {
+    width: 100%;
+    font-size: 0.9rem;
+    padding: 8px 10px;
+    padding-right: 40px;
+    min-height: 36px;
+  }
+  
+  .send-button {
+    position: absolute !important;
+    right: 4px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    margin: 0 !important;
+    width: 36px !important;
+    height: 36px !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  
+  .send-button svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+  
+  .send-button:hover:not(:disabled) {
+    transform: translateY(calc(-50% - 2px)) rotate(5deg);
+  }
+  
+  .model-dropdown-menu-inline {
+    min-width: 220px;
+    left: 0;
+    bottom: calc(100% + 8px);
   }
 }
 
@@ -1784,18 +1912,27 @@ pre, code {
   display: flex;
   align-items: center;
   justify-content: flex-start;
+  padding: 8px 0;
 }
 
+.loading-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 10px;
+}
+
+/* Animasyonlu nokta göstergesi - düzeltilmiş versiyon */
 .dot-flashing {
   position: relative;
-  width: 10px;
-  height: 10px;
-  border-radius: 5px;
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
   background-color: var(--primary-color);
   color: var(--primary-color);
-  animation: dot-flashing 1s infinite linear alternate;
+  animation: dot-flashing 1s infinite alternate;
   animation-delay: 0.5s;
-  box-shadow: 0 0 5px rgba(74, 108, 255, 0.3);
+  box-shadow: 0 0 5px rgba(83, 109, 254, 0.3);
 }
 
 .dot-flashing::before, .dot-flashing::after {
@@ -1807,32 +1944,36 @@ pre, code {
 
 .dot-flashing::before {
   left: -15px;
-  width: 10px;
-  height: 10px;
-  border-radius: 5px;
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
   background-color: var(--primary-color);
   color: var(--primary-color);
   animation: dot-flashing 1s infinite alternate;
   animation-delay: 0s;
+  box-shadow: 0 0 5px rgba(83, 109, 254, 0.3);
 }
 
 .dot-flashing::after {
   left: 15px;
-  width: 10px;
-  height: 10px;
-  border-radius: 5px;
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
   background-color: var(--primary-color);
   color: var(--primary-color);
   animation: dot-flashing 1s infinite alternate;
   animation-delay: 1s;
+  box-shadow: 0 0 5px rgba(83, 109, 254, 0.3);
 }
 
 @keyframes dot-flashing {
   0% {
     background-color: var(--primary-color);
+    transform: scale(1.0);
   }
   50%, 100% {
-    background-color: rgba(74, 108, 255, 0.2);
+    background-color: rgba(83, 109, 254, 0.3);
+    transform: scale(0.8);
   }
 }
 
@@ -2005,6 +2146,7 @@ pre, code {
 
 .send-button:hover:not(:disabled) {
   transform: translateY(calc(-50% - 2px)) rotate(5deg);
+  box-shadow: 0 4px 12px rgba(83, 109, 254, 0.4);
 }
 
 .send-button:disabled {
@@ -2326,10 +2468,6 @@ pre, code {
     left: 0;
     bottom: calc(100% + 8px);
   }
-  
-  .input-container {
-    padding: 10px;
-  }
 }
 
 @media (max-width: 480px) {
@@ -2338,12 +2476,31 @@ pre, code {
   }
   
   .input-row {
+    flex-direction: row !important;
     gap: 6px;
+    align-items: center;
+    width: 100%;
+  }
+  
+  .input-message-wrapper {
+    flex: 1;
+    position: relative;
+    width: 100%;
+  }
+  
+  .model-selector-inline {
+    margin-right: 4px;
   }
   
   .model-selector-inline-button {
     width: 36px;
     height: 36px;
+    min-width: 36px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
   }
   
   .model-icon svg {
@@ -2351,7 +2508,175 @@ pre, code {
     height: 16px;
   }
   
+  .message-input {
+    width: 100%;
+    font-size: 0.9rem;
+    padding: 8px 10px;
+    padding-right: 40px;
+    min-height: 36px;
+  }
+  
   .send-button {
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    margin: 0;
+  }
+  
+  .send-button:hover:not(:disabled) {
+    transform: translateY(calc(-50% - 2px)) rotate(5deg);
+  }
+  
+  .model-dropdown-menu-inline {
+    min-width: 220px;
+    left: 0;
+    bottom: calc(100% + 8px);
+    z-index: 1100;
+  }
+}
+
+/* Liste içindeki paragraflar için özel stil */
+.markdown-content li p,
+.markdown-list-item p {
+  margin-top: 0.1rem !important;
+  margin-bottom: 0.1rem !important;
+}
+
+/* Boş satırlar için daha az boşluk */
+.markdown-content br + br {
+  display: block !important;
+  content: "" !important;
+  margin-top: 0.1rem !important;
+}
+
+/* Mobil görünüm için temel düzenlemeler (768px'e kadar) */
+@media (max-width: 768px) {
+  /* Genel düzen */
+  .input-container {
+    padding: 10px;
+  }
+  
+  .input-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    position: relative;
+  }
+  
+  /* Model seçici */
+  .model-selector-inline {
+    margin-top: 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+  }
+  
+  .model-selector-inline-button {
+    height: 40px;
+    width: 40px;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    background-color: var(--bg-hover);
+  }
+  
+  .model-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .model-selector-inline-button:hover {
+    background-color: var(--primary-color);
+    color: white;
+  }
+  
+  .model-selector-inline-button:hover .model-icon {
+    color: white;
+  }
+  
+  /* Model seçici menüsü */
+  .model-dropdown-menu-inline {
+    min-width: 220px;
+    left: 0;
+    bottom: calc(100% + 8px);
+    z-index: 1100;
+  }
+  
+  /* Mesaj giriş alanı */
+  .input-message-wrapper {
+    flex: 1;
+    display: flex;
+    position: relative;
+  }
+  
+  .message-input {
+    width: 100%;
+    padding: 10px 12px;
+    padding-right: 45px;
+    min-height: 40px;
+    max-height: 100px;
+  }
+  
+  /* Gönderme butonu */
+  .send-button {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    margin: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .send-button:hover:not(:disabled) {
+    transform: translateY(calc(-50% - 2px)) rotate(5deg);
+  }
+  
+  .selected-model-name-short {
+    display: none;
+  }
+  
+  .dropdown-arrow {
+    display: none;
+  }
+}
+
+/* Daha küçük mobil ekranlar için düzenlemeler (480px'e kadar) */
+@media (max-width: 480px) {
+  /* Genel düzen */
+  .input-container {
+    padding: 8px;
+  }
+  
+  /* Model seçici */
+  .model-selector-inline-button {
+    height: 36px;
+    width: 36px;
+  }
+  
+  .model-icon svg {
+    width: 16px;
+    height: 16px;
+  }
+  
+  /* Mesaj giriş alanı */
+  .message-input {
+    padding: 8px 10px;
+    padding-right: 40px;
+    font-size: 0.9rem;
+    min-height: 36px;
+  }
+  
+  /* Gönderme butonu */
+  .send-button {
+    right: 4px;
     width: 36px;
     height: 36px;
   }
@@ -2361,12 +2686,7 @@ pre, code {
     height: 16px;
   }
   
-  .message-input {
-    font-size: 0.9rem;
-    padding: 8px 10px;
-    padding-right: 40px;
-  }
-  
+  /* Model seçici seçenekleri */
   .model-option-name {
     font-size: 0.85rem;
   }
@@ -2374,4 +2694,644 @@ pre, code {
   .model-option-description {
     font-size: 0.7rem;
   }
+}
+
+/* Merkezi Yeni Sohbet Butonu */
+.new-chat-btn-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-color);
+  color: white;
+  padding: 14px 24px;
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 8px 16px rgba(83, 109, 254, 0.2);
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 30px;
+  gap: 10px;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.new-chat-btn-center:hover {
+  background: var(--primary-hover);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 20px rgba(83, 109, 254, 0.3);
+}
+
+.new-chat-btn-center svg {
+  margin-right: 4px;
+  width: 22px;
+  height: 22px;
+}
+
+/* Welcome Content */
+.welcome-content {
+  text-align: center;
+  max-width: 600px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 30px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.welcome-content h1 {
+  font-size: 2rem;
+  margin-top: 0;
+  margin-bottom: 15px;
+  background: linear-gradient(135deg, var(--primary-color), #8a94ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+}
+
+.welcome-content p {
+  font-size: 1rem;
+  margin-bottom: 20px;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.welcome-logo {
+  width: 24px;
+  height: 24px;
+  margin-bottom: 10px;
+  filter: drop-shadow(0 2px 4px rgba(74, 108, 255, 0.2));
+}
+
+.welcome-features {
+  display: flex;
+  gap: 16px;
+  margin: 10px 0 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+}
+
+.welcome-feature {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: rgba(74, 108, 255, 0.05);
+  border-radius: 12px;
+  padding: 10px 12px;
+  transition: all 0.3s ease;
+  flex: 0 0 auto;
+  max-width: 100%;
+}
+
+.welcome-feature:hover {
+  transform: translateY(-2px);
+  background-color: rgba(74, 108, 255, 0.08);
+  box-shadow: 0 4px 12px rgba(74, 108, 255, 0.1);
+}
+
+.welcome-feature svg {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+}
+
+.welcome-feature span {
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: var(--text-color);
+  white-space: nowrap;
+}
+
+.new-chat-btn-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-color);
+  color: white;
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: none;
+  box-shadow: 0 4px 12px rgba(83, 109, 254, 0.2);
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+  gap: 8px;
+  width: auto;
+  max-width: 200px;
+}
+
+.new-chat-btn-center:hover {
+  background: var(--primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(83, 109, 254, 0.25);
+}
+
+.new-chat-btn-center svg {
+  width: 16px;
+  height: 16px;
+}
+
+.no-chat-selected {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-color);
+  text-align: center;
+  font-size: 1rem;
+  background-color: var(--bg-main);
+  border-radius: var(--radius);
+  padding: 2rem;
+  width: 100%;
+  max-width: 700px;
+  margin: 1rem auto;
+  overflow: visible;
+}
+
+@media (max-width: 768px) {
+  .welcome-features {
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  
+  .welcome-feature {
+    width: 100%;
+    max-width: 300px;
+    justify-content: flex-start;
+  }
+  
+  .welcome-content h1 {
+    font-size: 1.6rem;
+    margin-top: 10px;
+  }
+  
+  .welcome-content p {
+    font-size: 0.9rem;
+    margin-bottom: 16px;
+  }
+
+  .no-chat-selected {
+    padding: 1.5rem;
+    margin: 0.5rem auto;
+  }
+
+  .welcome-content {
+    padding: 15px;
+  }
+}
+
+.logo-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 15px;
+  position: relative;
+  width: 30px;
+  height: 30px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.logo-wrapper::before,
+.logo-wrapper::after {
+  content: '';
+  position: absolute;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(74, 108, 255, 0.05) 0%, transparent 70%);
+  animation: none;
+}
+
+.logo-wrapper::before {
+  z-index: -1;
+}
+
+.logo-wrapper::after {
+  z-index: -2;
+  animation-delay: 2s;
+  width: 130px;
+  height: 130px;
+  background: radial-gradient(circle, rgba(74, 108, 255, 0.03) 0%, transparent 70%);
+}
+
+@keyframes pulse-glow {
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1.3);
+    opacity: 0.2;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) rotate(0);
+  }
+  25% {
+    transform: translateY(-6px) rotate(1deg);
+  }
+  50% {
+    transform: translateY(0) rotate(0);
+  }
+  75% {
+    transform: translateY(6px) rotate(-1deg);
+  }
+}
+
+.neon-logo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto 30px;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  position: relative;
+  background: rgba(10, 12, 20, 0.8);
+  overflow: hidden;
+  /* Dairesel parlaklık efekti */
+  box-shadow: 0 0 15px rgba(74, 108, 255, 0.3);
+}
+
+/* İçteki çizginin parlaklığı için */
+.neon-logo-container::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60px;
+  height: 60px;
+  background: radial-gradient(circle, rgba(74, 108, 255, 0.2) 0%, transparent 70%);
+  border-radius: 50%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.neon-logo {
+  position: relative;
+  z-index: 2;
+  filter: none;
+}
+
+.neon-path {
+  stroke: #4A6CFF;
+  stroke-width: 1.5;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: neon-flow 4s linear infinite;
+  filter: none;
+}
+
+@keyframes neon-flow {
+  0% {
+    stroke-dashoffset: 100;
+    stroke: #4A6CFF;
+    stroke-width: 1.5;
+  }
+  25% {
+    stroke: #5D7DFF;
+    stroke-width: 2;
+  }
+  50% {
+    stroke-dashoffset: 0;
+    stroke: #7B96FF;
+    stroke-width: 2.5;
+  }
+  75% {
+    stroke: #5D7DFF;
+    stroke-width: 2;
+  }
+  100% {
+    stroke-dashoffset: -100;
+    stroke: #4A6CFF;
+    stroke-width: 1.5;
+  }
+}
+
+/* Neon yükleme animasyonu */
+.neon-loading-container {
+  display: flex;
+  align-items: center;
+  padding: 5px 0;
+}
+
+.neon-loading-path {
+  stroke-dasharray: 60;
+  stroke-dashoffset: 60;
+  animation: neon-loading 2s linear infinite;
+  filter: none;
+}
+
+.loading-text {
+  margin-left: 12px;
+  font-size: 14px;
+  color: var(--text-muted);
+  animation: text-pulse 2s infinite ease-in-out;
+}
+
+@keyframes neon-loading {
+  0% {
+    stroke-dashoffset: 60;
+    stroke: #4A6CFF;
+    stroke-width: 1.5;
+  }
+  25% {
+    stroke: #5D7DFF;
+    stroke-width: 2;
+  }
+  50% {
+    stroke-dashoffset: -60;
+    stroke: #7B96FF;
+    stroke-width: 2.2;
+  }
+  75% {
+    stroke: #5D7DFF;
+    stroke-width: 2;
+  }
+  100% {
+    stroke-dashoffset: -180;
+    stroke: #4A6CFF;
+    stroke-width: 1.5;
+  }
+}
+
+@keyframes text-pulse {
+  0%, 100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* NEON YÜKLEME ANİMASYONU - TAM YENİ TASARIM */
+.pure-neon-loading {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 10px;
+  background: rgba(10, 10, 20, 0.3);
+  border-radius: 30px;
+  box-shadow: 0 0 10px rgba(74, 108, 255, 0.2);
+}
+
+.pure-neon-path {
+  stroke-dasharray: 60;
+  stroke-dashoffset: 300;
+  animation: pure-neon-circle 3s linear infinite;
+}
+
+.pure-loading-text {
+  font-weight: 500;
+  font-size: 15px;
+  color: #4A6CFF;
+  text-shadow: 0 0 8px rgba(74, 108, 255, 0.6);
+  animation: neon-text-pulse 2s infinite ease-in-out;
+  letter-spacing: 0.5px;
+}
+
+@keyframes pure-neon-circle {
+  0% {
+    stroke-dashoffset: 180;
+    stroke: #4A6CFF;
+    stroke-width: 1.5;
+    filter: drop-shadow(0 0 2px #4A6CFF);
+  }
+  
+  25% {
+    stroke: #5D7DFF;
+    stroke-width: 2.5;
+    filter: drop-shadow(0 0 6px #5D7DFF);
+  }
+  
+  50% {
+    stroke-dashoffset: 60;
+    stroke: #819FFF;
+    stroke-width: 3;
+    filter: drop-shadow(0 0 8px #819FFF);
+  }
+  
+  75% {
+    stroke: #5D7DFF;
+    stroke-width: 2.5;
+    filter: drop-shadow(0 0 6px #5D7DFF);
+  }
+  
+  100% {
+    stroke-dashoffset: -60;
+    stroke: #4A6CFF;
+    stroke-width: 1.5;
+    filter: drop-shadow(0 0 2px #4A6CFF);
+  }
+}
+
+@keyframes neon-text-pulse {
+  0%, 100% {
+    opacity: 0.8;
+    text-shadow: 0 0 4px rgba(74, 108, 255, 0.4);
+  }
+  50% {
+    opacity: 1;
+    text-shadow: 0 0 8px rgba(74, 108, 255, 0.8), 0 0 12px rgba(74, 108, 255, 0.4);
+  }
+}
+
+/* YENİ - MESAJ BALONCUĞUNA UYUMLU ANİMASYON */
+.pure-neon-loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.pure-neon-path {
+  stroke-dasharray: 50;
+  stroke-dashoffset: 240;
+  animation: pure-neon-circle 3s linear infinite;
+}
+
+.pure-loading-text {
+  font-weight: 500;
+  font-size: 15px;
+  color: var(--text-primary);
+  text-shadow: 0 0 5px rgba(74, 108, 255, 0.4);
+  animation: neon-text-pulse 2s infinite ease-in-out;
+  letter-spacing: 0.5px;
+}
+
+@keyframes pure-neon-circle {
+  0% {
+    stroke-dashoffset: 240;
+    stroke: #4A6CFF;
+    stroke-width: 2;
+    filter: drop-shadow(0 0 2px #4A6CFF);
+  }
+  
+  25% {
+    stroke: #5D7DFF;
+    stroke-width: 2.5;
+    filter: drop-shadow(0 0 4px #5D7DFF);
+  }
+  
+  50% {
+    stroke-dashoffset: 120;
+    stroke: #819FFF;
+    stroke-width: 3;
+    filter: drop-shadow(0 0 6px #819FFF);
+  }
+  
+  75% {
+    stroke: #5D7DFF;
+    stroke-width: 2.5;
+    filter: drop-shadow(0 0 4px #5D7DFF);
+  }
+  
+  100% {
+    stroke-dashoffset: 0;
+    stroke: #4A6CFF;
+    stroke-width: 2;
+    filter: drop-shadow(0 0 2px #4A6CFF);
+  }
+}
+
+@keyframes neon-text-pulse {
+  0%, 100% {
+    opacity: 0.8;
+    text-shadow: 0 0 3px rgba(74, 108, 255, 0.3);
+  }
+  50% {
+    opacity: 1;
+    text-shadow: 0 0 5px rgba(74, 108, 255, 0.5);
+  }
+}
+
+.loading-content {
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 8px 0;
+}
+
+/* MESAJ BALONCUĞUNA UYUMLU NEON ANİMASYON */
+.pure-neon-loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0;
+  background: transparent;
+  width: 100%;
+  height: 100%;
+}
+
+.pure-neon-path {
+  stroke-dasharray: 40;
+  stroke-dashoffset: 240;
+  animation: pure-neon-circle 2.5s linear infinite;
+}
+
+.pure-loading-text {
+  font-weight: 500;
+  font-size: 14px;
+  color: inherit;
+  text-shadow: 0 0 4px rgba(74, 108, 255, 0.3);
+  animation: neon-text-pulse 2s infinite ease-in-out;
+  letter-spacing: 0.2px;
+}
+
+@keyframes pure-neon-circle {
+  0% {
+    stroke-dashoffset: 160;
+    stroke: #4A6CFF;
+    stroke-width: 2;
+    filter: drop-shadow(0 0 2px rgba(74, 108, 255, 0.8));
+  }
+  
+  50% {
+    stroke-dashoffset: 80;
+    stroke: #819FFF;
+    stroke-width: 3;
+    filter: drop-shadow(0 0 4px rgba(129, 159, 255, 0.8));
+  }
+  
+  100% {
+    stroke-dashoffset: 0;
+    stroke: #4A6CFF;
+    stroke-width: 2;
+    filter: drop-shadow(0 0 2px rgba(74, 108, 255, 0.8));
+  }
+}
+
+@keyframes neon-text-pulse {
+  0%, 100% {
+    opacity: 0.85;
+    text-shadow: 0 0 2px currentColor;
+  }
+  50% {
+    opacity: 1;
+    text-shadow: 0 0 4px currentColor;
+  }
+}
+
+.pure-neon-loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0;
+  background: transparent;
+  width: 100%;
+  height: 100%;
+}
+
+.pure-neon-path {
+  stroke-dasharray: 40;
+  stroke-dashoffset: 240;
+  animation: pure-neon-circle 2.5s linear infinite;
+}
+
+.pure-loading-text {
+  font-weight: 500;
+  font-size: 14px;
+  color: inherit;
+  text-shadow: 0 0 4px rgba(74, 108, 255, 0.3);
+  animation: neon-text-pulse 2s infinite ease-in-out;
+  letter-spacing: 0.2px;
+}
+
+/* YENİ DÜZELTMELER - YAZIYA ALAN AÇMA */
+.pure-neon-loading {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 0 0 0 5px;
+  background: transparent;
+  width: 100%;
+  height: 100%;
+}
+
+.pure-loading-text {
+  font-weight: 500;
+  font-size: 14px;
+  color: inherit;
+  text-shadow: 0 0 4px rgba(74, 108, 255, 0.3);
+  animation: neon-text-pulse 2s infinite ease-in-out;
+  letter-spacing: 0.2px;
+  padding-right: 15px;
 }

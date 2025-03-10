@@ -1,12 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import '../styles.css';
 import api from '../services/api';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import ModelSelector from './ModelSelector';
 
-const ChatWindow = ({ activeChatId, createChat, isNewChat, messages, updateMessages, sendMessage }) => {
+const ChatWindow = ({ activeChatId, createChat, isNewChat, messages, updateMessages, sendMessage, selectedModel, onModelSelect }) => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
+  const messageContainerRef = useRef(null);
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -16,7 +22,17 @@ const ChatWindow = ({ activeChatId, createChat, isNewChat, messages, updateMessa
   // Reset input when active chat changes
   useEffect(() => {
     setInput('');
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+    }
   }, [activeChatId]);
+
+  // Auto-focus on textarea when chat changes
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, [activeChatId, isNewChat]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -89,6 +105,112 @@ const ChatWindow = ({ activeChatId, createChat, isNewChat, messages, updateMessa
     return sender === 'user' ? 'S' : 'B';
   };
 
+  // Preprocess the content to ensure proper markdown rendering
+  const preprocessMarkdown = (content) => {
+    if (!content) return '';
+
+    // Replace escaped newlines with actual newlines
+    let processedContent = content.replace(/\\n/g, '\n');
+    
+    // Ensure paragraph breaks have double newlines
+    processedContent = processedContent.replace(/\n\n/g, '\n\n');
+    
+    // Fix headers to ensure they're properly spaced
+    processedContent = processedContent.replace(/\n(#{1,6})\s/g, '\n\n$1 ');
+    
+    // Ensure lists are properly formatted
+    processedContent = processedContent.replace(/\n(\d+\.|\*|\-)\s/g, '\n\n$1 ');
+    
+    // Ensure code blocks are properly formatted
+    processedContent = processedContent.replace(/```(\w*)\n/g, '\n```$1\n');
+    
+    return processedContent;
+  };
+
+  // Render custom components for markdown
+  const MarkdownComponents = {
+    // Custom renderer for code blocks with syntax highlighting
+    code(props) {
+      const { children, className, node, ...rest } = props;
+      const match = /language-(\w+)/.exec(className || '');
+      return match ? (
+        <SyntaxHighlighter
+          language={match[1]}
+          style={vscDarkPlus}
+          PreTag="div"
+          className="codeblock"
+          {...rest}
+        >
+          {String(children).replace(/\n$/, '')}
+        </SyntaxHighlighter>
+      ) : (
+        <code className="codeblock-inline" {...rest}>
+          {children}
+        </code>
+      );
+    },
+    // Make all links open in a new tab
+    a(props) {
+      return <a target="_blank" rel="noreferrer noopener" {...props} />;
+    },
+    // Custom paragraph renderer to handle newlines properly
+    p(props) {
+      const { children } = props;
+      return <p className="markdown-paragraph">{children}</p>;
+    },
+    // Custom heading renderers
+    h1(props) {
+      const { children } = props;
+      return <h1 className="markdown-heading">{children}</h1>;
+    },
+    h2(props) {
+      const { children } = props;
+      return <h2 className="markdown-heading">{children}</h2>;
+    },
+    h3(props) {
+      const { children } = props;
+      return <h3 className="markdown-heading">{children}</h3>;
+    }
+  };
+
+  // Function to render message content
+  const renderMessageContent = (content, sender) => {
+    // For user messages, render as plain text
+    if (sender === 'user') {
+      return <div className="message-text">{content}</div>;
+    }
+    
+    // If content has raw line breaks, use a pre-rendered version
+    if (content && content.includes('\\n')) {
+      // Use dangerouslySetInnerHTML as a fallback for escaped newlines
+      const htmlContent = content
+        .replace(/\\n\\n/g, '<br/><br/>')
+        .replace(/\\n/g, '<br/>')
+        .replace(/#{3}\s+([^<]+)/g, '<h3>$1</h3>')
+        .replace(/#{2}\s+([^<]+)/g, '<h2>$1</h2>')
+        .replace(/#{1}\s+([^<]+)/g, '<h1>$1</h1>');
+      
+      return (
+        <div 
+          className="message-text markdown-content" 
+          dangerouslySetInnerHTML={{ __html: htmlContent }}
+        />
+      );
+    }
+    
+    // For bot messages, render markdown with all the necessary plugins
+    return (
+      <div className="message-text markdown-content">
+        <ReactMarkdown
+          remarkPlugins={[remarkGfm]}
+          components={MarkdownComponents}
+        >
+          {preprocessMarkdown(content)}
+        </ReactMarkdown>
+      </div>
+    );
+  };
+
   return (
     <div className="chat-window">
       {activeChatId && (
@@ -102,7 +224,7 @@ const ChatWindow = ({ activeChatId, createChat, isNewChat, messages, updateMessa
         </div>
       )}
       
-      <div className="messages-container">
+      <div className="messages-container" ref={messageContainerRef}>
         {messages && messages.length > 0 ? (
           <>
             {messages.map((msg) => (
@@ -114,68 +236,79 @@ const ChatWindow = ({ activeChatId, createChat, isNewChat, messages, updateMessa
                   {getInitial(msg.sender)}
                 </div>
                 <div className="message-content">
-                  <div className="message-text">{msg.content}</div>
+                  {renderMessageContent(msg.content, msg.sender)}
                   {msg.timestamp && <div className="message-time">{msg.timestamp}</div>}
                 </div>
               </div>
             ))}
             {isLoading && (
-              <div className="loading-spinner">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 2V6M12 18V22M6 12H2M22 12H18M19.07 4.93L16.24 7.76M7.76 16.24L4.93 19.07M19.07 19.07L16.24 16.24M7.76 7.76L4.93 4.93" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
+              <div className="message bot">
+                <div className="message-avatar">
+                  B
+                </div>
+                <div className="message-content loading-content">
+                  <div className="loading-spinner">
+                    <div className="dot-flashing"></div>
+                  </div>
+                </div>
               </div>
             )}
             <div ref={messagesEndRef} />
           </>
         ) : (
           <div className="welcome-message">
-            <h2 className="welcome-title">Sohbete Başlayın</h2>
-            <p className="welcome-subtitle">
-              Yapay zeka ile sohbet etmek için aşağıdaki metin kutusuna mesajınızı yazın.
-              Herhangi bir konuda soru sorabilir veya yardım isteyebilirsiniz.
-            </p>
+            <div className="welcome-title">ChatBurak'a Hoş Geldiniz!</div>
+            <div className="welcome-subtitle">Size nasıl yardımcı olabilirim?</div>
             <div className="suggestion-chips">
-              <div className="suggestion-chip" onClick={() => setInput("Merhaba, nasıl yardımcı olabilirsin?")}>
-                Merhaba, nasıl yardımcı olabilirsin?
-              </div>
-              <div className="suggestion-chip" onClick={() => setInput("Bana bir hikaye anlatır mısın?")}>
-                Bana bir hikaye anlatır mısın?
-              </div>
-              <div className="suggestion-chip" onClick={() => setInput("Bugün hava nasıl?")}>
-                Bugün hava nasıl?
-              </div>
+              <button className="suggestion-chip" onClick={() => setInput("Yapay zeka hakkında bilgi verir misin?")}>
+                Yapay zeka hakkında bilgi verir misin?
+              </button>
+              <button className="suggestion-chip" onClick={() => setInput("Bir hikaye yazar mısın?")}>
+                Bir hikaye yazar mısın?
+              </button>
+              <button className="suggestion-chip" onClick={() => setInput("Güncel haber başlıklarını özetler misin?")}>
+                Güncel haber başlıklarını özetler misin?
+              </button>
             </div>
           </div>
         )}
       </div>
       
       <div className="input-container">
-        <textarea
-          ref={textareaRef}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyPress}
-          placeholder="Mesajınızı yazın... (Enter tuşuna basarak gönderebilirsiniz)"
-          className="message-input"
-          disabled={isLoading}
-          rows="1"
-        />
-        <button 
-          onClick={handleSendMessage} 
-          className="send-button"
-          disabled={isLoading || !input.trim()}
-        >
-          {isLoading ? (
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 2V6M12 18V22M6 12H2M22 12H18M19.07 4.93L16.24 7.76M7.76 16.24L4.93 19.07M19.07 19.07L16.24 16.24M7.76 7.76L4.93 4.93" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          ) : (
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M22 2L11 13M22 2L15 22L11 13M11 13L2 9L22 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          )}
-        </button>
+        <div className="input-wrapper">
+          <div className="input-row">
+            <div className="model-selector-inline">
+              <ModelSelector 
+                selectedModel={selectedModel} 
+                onModelSelect={onModelSelect} 
+              />
+            </div>
+            <div className="input-message-wrapper">
+              <textarea
+                ref={textareaRef}
+                className="message-input"
+                placeholder="Mesajınızı yazın..."
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyPress}
+                rows={1}
+                aria-label="Mesaj metni giriş alanı"
+              />
+              <button
+                className="send-button"
+                onClick={handleSendMessage}
+                disabled={!input.trim() || isLoading}
+                aria-label="Mesajı gönder"
+                title="Mesajı gönder (veya Enter'a basın)"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M22 2L11 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

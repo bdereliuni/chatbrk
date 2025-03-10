@@ -1,8 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles.css';
 
-const Sidebar = ({ chats, setActiveChat, createNewChat }) => {
+const Sidebar = ({ chats, setActiveChat, createNewChat, activeChatId }) => {
   const [selectedChat, setSelectedChat] = useState(null);
+
+  // Aktif chat değiştiğinde seçili chat'i güncelle
+  useEffect(() => {
+    if (activeChatId) {
+      setSelectedChat(activeChatId);
+    }
+  }, [activeChatId]);
+
+  // Aktif chat değiştiğinde kaydırma çubuğunu otomatik pozisyona ayarla
+  useEffect(() => {
+    if (selectedChat) {
+      const selectedElement = document.getElementById(`chat-${selectedChat}`);
+      if (selectedElement) {
+        selectedElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+  }, [selectedChat]);
 
   const handleChatClick = (chatId) => {
     setSelectedChat(chatId);
@@ -10,19 +27,22 @@ const Sidebar = ({ chats, setActiveChat, createNewChat }) => {
   };
 
   return (
-    <div className="sidebar">
-      <button className="new-chat-btn" onClick={createNewChat}>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 5V19M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-        Yeni Chat Oluştur
-      </button>
+    <>
+      <div className="sidebar-header">
+        <button className="new-chat-btn" onClick={createNewChat}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 5V19M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          Yeni Chat Oluştur
+        </button>
+      </div>
       
       <div className="chats-container">
-        {chats.length > 0 ? (
+        {chats && chats.length > 0 ? (
           <ul className="chat-list">
             {chats.map((chat) => (
               <li
+                id={`chat-${chat.id}`}
                 key={chat.id}
                 className={`chat-item ${selectedChat === chat.id ? 'selected' : ''}`}
                 onClick={() => handleChatClick(chat.id)}
@@ -44,7 +64,7 @@ const Sidebar = ({ chats, setActiveChat, createNewChat }) => {
           </div>
         )}
       </div>
-    </div>
+    </>
   );
 };
 

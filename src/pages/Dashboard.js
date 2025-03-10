@@ -14,6 +14,7 @@ const Dashboard = () => {
   const [chatMessages, setChatMessages] = useState({}); // Her chat için mesajlar
   const [user, setUser] = useState(null); // Şu anki kullanıcı
   const [selectedModel, setSelectedModel] = useState('claude3-sonnet'); // Seçili model
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Mobil görünümde sidebar durumu
 
   // Kullanıcıyı ve chat'leri yükle
   useEffect(() => {
@@ -27,7 +28,8 @@ const Dashboard = () => {
         const { data: chatsData, error: chatsError } = await supabase
           .from('chats')
           .select('*')
-          .eq('user_id', session.user.id);
+          .eq('user_id', session.user.id)
+          .order('created_at', { ascending: false }); // En son oluşturulan chatleri önce getir (id yerine created_at)
 
         if (chatsError) {
           console.error('Chatler yüklenemedi:', chatsError);
@@ -38,6 +40,7 @@ const Dashboard = () => {
           setChats(chatsData.map(chat => ({
             id: chat.chat_id,
             title: chat.title,
+            createdAt: chat.created_at
           })));
 
           // Chat varsa, yeni chat ekranını kapat
@@ -76,18 +79,36 @@ const Dashboard = () => {
     };
 
     fetchUserAndChats();
+
+    // Pencere boyutu değiştiğinde sidebar'ı kontrol et
+    const handleResize = () => {
+      if (window.innerWidth > 768) {
+        setIsSidebarOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   // Yeni chat ekranını aç (boş bir ekran)
   const openNewChatScreen = () => {
     setActiveChatId(null);
     setIsNewChat(true);
+    // Mobil görünümde chat'e tıklandığında sidebar'ı kapat
+    if (window.innerWidth <= 768) {
+      setIsSidebarOpen(false);
+    }
   };
 
   // Chat oluştur ve listeye ekle (ChatWindow'dan çağrılacak)
   const createChat = async () => {
     const newChatId = `chat-${Date.now()}`;
-    const newChat = { id: newChatId, title: `Chat ${chats.length + 1}` };
+    const newChat = { 
+      id: newChatId, 
+      title: `Chat ${chats.length + 1}`,
+      createdAt: new Date().toISOString()
+    };
 
     // Supabase'e chat'i kaydet
     const { error } = await supabase
@@ -96,6 +117,7 @@ const Dashboard = () => {
         user_id: user.id,
         chat_id: newChatId,
         title: newChat.title,
+        created_at: newChat.createdAt
       });
 
     if (error) {
@@ -103,7 +125,8 @@ const Dashboard = () => {
       return;
     }
 
-    setChats((prev) => [...prev, newChat]);
+    // Yeni chati dizinin başına ekle (en üstte görünsün)
+    setChats((prev) => [newChat, ...prev]);
     setActiveChatId(newChatId);
     setIsNewChat(false);
     return newChatId;
@@ -139,23 +162,42 @@ const Dashboard = () => {
     return response;
   };
 
+  // Sidebar'ı aç/kapat
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  // Chat seçildiğinde tetiklenen fonksiyon
+  const handleSetActiveChat = (chatId) => {
+    setActiveChatId(chatId);
+    setIsNewChat(false);
+    // Mobil görünümde chat'e tıklandığında sidebar'ı kapat
+    if (window.innerWidth <= 768) {
+      setIsSidebarOpen(false);
+    }
+  };
+
   return (
     <div className="dashboard-page">
-      <Header isLoggedIn={!!user} />
+      <Header isLoggedIn={!!user} toggleSidebar={toggleSidebar} />
+      
+      {/* Overlay - Mobil görünümde sidebar açıkken gösterilir */}
+      <div 
+        className={`sidebar-overlay ${isSidebarOpen ? 'active' : ''}`} 
+        onClick={() => setIsSidebarOpen(false)}
+      ></div>
+      
       <div className="dashboard-content">
-        <Sidebar
-          chats={[...chats].reverse()} // En yeni chatler başta olacak şekilde sıralama
-          setActiveChat={(chatId) => {
-            setActiveChatId(chatId);
-            setIsNewChat(false);
-          }}
-          createNewChat={openNewChatScreen}
-        />
-        <div className="main-content">
-          <ModelSelector 
-            selectedModel={selectedModel} 
-            onModelSelect={setSelectedModel} 
+        <div className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
+          <Sidebar
+            chats={chats} // Chatleri olduğu gibi geçiyoruz, artık reverse() yapmaya gerek yok
+            setActiveChat={handleSetActiveChat}
+            createNewChat={openNewChatScreen}
+            activeChatId={activeChatId} // Aktif chat ID'sini Sidebar'a iletiyoruz
           />
+        </div>
+        
+        <div className="main-content">
           <ChatWindow
             activeChatId={activeChatId}
             createChat={createChat}
@@ -163,6 +205,8 @@ const Dashboard = () => {
             messages={chatMessages[activeChatId] || []}
             updateMessages={updateMessages}
             sendMessage={handleSendMessage}
+            selectedModel={selectedModel}
+            onModelSelect={setSelectedModel}
           />
         </div>
       </div>
